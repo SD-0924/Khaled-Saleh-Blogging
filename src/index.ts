@@ -2,6 +2,7 @@
 import dotenv from 'dotenv'
 import server from './server';
 import { sequelizeAuthentication } from './config/sequelize';
+import './models/associations';
 dotenv.config();
 
 (async() =>{

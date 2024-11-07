@@ -1,9 +1,9 @@
-import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "@sequelize/core";
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "@sequelize/core";
 import sequelize from "../config/sequelize";
 import User from "./user";
 
 export interface PostInstance extends Model<InferAttributes<PostInstance>, InferCreationAttributes<PostInstance>> {
-    id: number;
+    id: CreationOptional<number>;
     title: string;
     content: string;
     userId: number;

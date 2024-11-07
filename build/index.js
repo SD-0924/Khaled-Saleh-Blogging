@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const server_1 = __importDefault(require("./server"));
 const sequelize_1 = require("./config/sequelize");
+require("./models/associations");
 dotenv_1.default.config();
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, sequelize_1.sequelizeAuthentication)();
