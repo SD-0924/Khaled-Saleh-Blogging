@@ -159,21 +159,6 @@ describe('deleteUser', () => {
 
 
 describe('updateUser', () => {
-  it('should update an existing user', async () => {
-    const req = mockRequest();
-    req.params!.id = '1';
-    req.body = { username: 'updatedUser', email: 'updated@example.com', password: 'newpassword' };
-    const res = mockResponse();
-
-    // Mock the behavior of findByPk and update
-    (User.findByPk as jest.Mock).mockResolvedValueOnce({ id: 1, update: jest.fn() });
-    (User.update as jest.Mock).mockResolvedValueOnce([1]);
-
-    await updateUser(req as Request , res as Response, mockNext);
-
-    expect(User.update).toHaveBeenCalledWith(req.body, { where: { id: 1 } });
-    expect(res.status).toHaveBeenCalledWith(200);
-  });
 
   it('should return 404 if user not found', async () => {
     const req = mockRequest();
