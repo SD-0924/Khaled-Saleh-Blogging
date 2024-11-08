@@ -23,4 +23,4 @@ jobs:
 
     - name: Run Basic Tests
       run: |
-        npm test --testNamePattern="createUser|getUsers|getUser"
+        npm run test -- --testNamePattern="createUser|getUsers|getUser"
