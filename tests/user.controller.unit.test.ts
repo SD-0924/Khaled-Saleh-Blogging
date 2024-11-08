@@ -159,11 +159,11 @@ describe('updateUser', () => {
     req.body = { username: 'updatedUser', email: 'updated@example.com', password: 'newpassword' };
     const res = mockResponse();
 
-    const mockUser = { id: 1, ...req.body };
-    jest.spyOn(User, 'findByPk').mockResolvedValueOnce(mockUser);
-    jest.spyOn(User, 'update').mockResolvedValueOnce([1]);
+    // Mock the behavior of findByPk and update
+    (User.findByPk as jest.Mock).mockResolvedValueOnce({ id: 1, update: jest.fn() });
+    (User.update as jest.Mock).mockResolvedValueOnce([1]);
 
-    await updateUser(req as Request, res as Response, mockNext);
+    await updateUser(req as Request , res as Response, mockNext);
 
     expect(User.update).toHaveBeenCalledWith(req.body, { where: { id: 1 } });
     expect(res.status).toHaveBeenCalledWith(200);
