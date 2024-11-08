@@ -23,4 +23,4 @@ jobs:
 
     - name: Run Basic Tests
       run: |
-        npm run test -- --testPathPattern='createUser|getUsers|getUser'
+        jest --testPathPattern=user.controller.unit.test.ts'
