@@ -13,6 +13,12 @@ const mockResponse = (): Partial<Response> => {
   res.send = jest.fn().mockReturnValue(res);
   return res;
 };
+// Mock the specific Sequelize model methods
+User.findByPk = jest.fn();
+User.update = jest.fn();
+User.destroy = jest.fn();
+User.findOne = jest.fn();
+User.findAndCountAll = jest.fn();
 const mockNext: NextFunction = jest.fn();
 
 describe('createUser', () => {
