@@ -1,22 +1,21 @@
-import { Sequelize } from '@sequelize/core';
-import { MsSqlDialect } from '@sequelize/mssql';
 import dotenv from 'dotenv'
+import { Sequelize } from 'sequelize';
 dotenv.config();
 
 const sequelize = new Sequelize({
-    dialect: MsSqlDialect,
-    server: process.env.DBSERVER,
-    port: Number(process.env.DBPORT),
-    database: process.env.DBNAME,
-    authentication: {
-      type: "default",
+  dialect: "mssql",
+  host: process.env.DBSERVER,
+  port: Number(process.env.DBPORT),
+  database: process.env.DBNAME,
+  username: process.env.DBUSERNAME,
+  password: process.env.DBPASSWORD,
+  dialectOptions: {
       options: {
-        userName: process.env.DBUSERNAME,
-        password: process.env.DBPASSWORD,
+          trustServerCertificate: true,
+          encrypt: true,
       }
-    },
-    trustServerCertificate : true,
-    encrypt: true
+  },
+  logging: false
 });
 
 export const sequelizeAuthentication = async () => {
@@ -24,7 +23,6 @@ export const sequelizeAuthentication = async () => {
         console.log("Connecting to the database...");
         await sequelize.authenticate();
         console.log("Connection with database has been established successfully.");
-        await sequelize.sync();
     } catch (exception : any) {
         console.error('Unable to connect to the database:', exception.message);
     }

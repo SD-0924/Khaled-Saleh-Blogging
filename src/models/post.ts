@@ -1,6 +1,8 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "@sequelize/core";
 import sequelize from "../config/sequelize";
+import { CategoryInstance } from "./category";
 import User from "./user";
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+
 
 export interface PostInstance extends Model<InferAttributes<PostInstance>, InferCreationAttributes<PostInstance>> {
     id: CreationOptional<number>;
@@ -31,9 +33,6 @@ const Post = sequelize.define<PostInstance>("Post",
                 key: 'id',
             },
         },
-    }, 
-    {
-        tableName: 'posts'
     }
 )
 

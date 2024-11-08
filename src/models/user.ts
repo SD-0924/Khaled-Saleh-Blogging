@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from '@sequelize/core';
 import sequelize from '../config/sequelize';
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 
 
 
@@ -42,7 +42,6 @@ const User = sequelize.define<UserInstance>(
     },
   },
   {
-    tableName: 'users',
     timestamps: true,
     hooks: {
       beforeCreate: async (user) => {

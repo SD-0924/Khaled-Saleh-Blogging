@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPosts = exports.createPost = void 0;
+exports.getPostComments = exports.addCommentToPost = exports.getPostCategories = exports.addCategoryToPost = exports.deletePost = exports.updatePost = exports.getPost = exports.getPosts = exports.createPost = void 0;
 const post_1 = __importDefault(require("../models/post"));
 const Result_1 = __importDefault(require("../utilites/Result"));
 const user_1 = __importDefault(require("../models/user"));
@@ -24,11 +24,11 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const user = yield user_1.default.findByPk(userId);
     if (user == null) {
         const error = {
-            message: constants_1.default.USERNOTFOUND,
+            message: constants_1.default.USER_NOT_FOUND,
             name: "userId",
         };
         const result = new Result_1.default(error, 404);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     const post = yield post_1.default.create({ title, content, userId });
@@ -59,3 +59,163 @@ const getPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.status(resultResponse.statusCode).json(resultResponse.value);
 });
 exports.getPosts = getPosts;
+const getPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const postId = Number(req.params.id);
+    const post = yield post_1.default.findByPk(postId, {
+        include: [
+            { model: user_1.default, as: 'author', attributes: ['id', 'username'] },
+            { model: category_1.default, as: 'categories', through: { attributes: [] } },
+            {
+                model: comment_1.default,
+                as: 'comments',
+                attributes: ['id', 'content', 'createdAt', 'updatedAt'],
+                include: [{ model: user_1.default, as: 'author', attributes: ['id', 'username'] }]
+            }
+        ],
+    });
+    if (post == null) {
+        const error = {
+            message: constants_1.default.POST_NOT_FOUND,
+            name: "Id",
+        };
+        const result = new Result_1.default(error, 404);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    const result = new Result_1.default(post, 200);
+    res.status(result.statusCode).json(result.value);
+});
+exports.getPost = getPost;
+const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = Number(req.params.id);
+    const { title, content } = req.body;
+    const post = yield post_1.default.findByPk(id);
+    if (post == null) {
+        const error = {
+            message: constants_1.default.POST_NOT_FOUND,
+            name: "Id",
+        };
+        const result = new Result_1.default(error, 404);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    yield post_1.default.update({
+        title,
+        content
+    }, {
+        where: { id }
+    });
+    res.status(200).json();
+});
+exports.updatePost = updatePost;
+const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = Number(req.params.id);
+    const post = yield post_1.default.findByPk(id);
+    if (post == null) {
+        const error = {
+            message: constants_1.default.POST_NOT_FOUND,
+            name: "Id",
+        };
+        const result = new Result_1.default(error, 404);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    yield post_1.default.destroy({
+        where: { id }
+    });
+    const result = new Result_1.default(post, 200);
+    res.status(result.statusCode).json(result.value);
+});
+exports.deletePost = deletePost;
+const addCategoryToPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const postId = Number(req.params.id);
+    const { name } = req.body;
+    const post = yield post_1.default.findByPk(postId);
+    if (post == null) {
+        const error = {
+            message: constants_1.default.POST_NOT_FOUND,
+            name: "Id",
+        };
+        const result = new Result_1.default(error, 404);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    let category = yield category_1.default.findOrCreate({ where: { name } });
+    yield category[0].addPost(post);
+    const result = new Result_1.default(null, 201);
+    res.status(result.statusCode).json();
+});
+exports.addCategoryToPost = addCategoryToPost;
+const getPostCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const postId = Number(req.params.id);
+    const post = yield post_1.default.findByPk(postId, {
+        include: [{ model: category_1.default, as: 'categories', through: { attributes: [] } }]
+    });
+    if (post == null) {
+        const error = {
+            message: constants_1.default.POST_NOT_FOUND,
+            name: "Id",
+        };
+        const result = new Result_1.default(error, 404);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    const result = new Result_1.default(post.dataValues.categories, 200);
+    res.status(result.statusCode).json(result.value);
+});
+exports.getPostCategories = getPostCategories;
+const addCommentToPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const postId = Number(req.params.id);
+    const { content, userId } = req.body;
+    const post = yield post_1.default.findByPk(postId);
+    if (post == null) {
+        const error = {
+            message: constants_1.default.POST_NOT_FOUND,
+            name: "Id",
+        };
+        const result = new Result_1.default(error, 404);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    const user = yield user_1.default.findByPk(userId);
+    if (user == null) {
+        const error = {
+            message: constants_1.default.USER_NOT_FOUND,
+            name: "userId",
+        };
+        const result = new Result_1.default(error, 404);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    yield comment_1.default.create({
+        content,
+        postId,
+        userId
+    });
+    const result = new Result_1.default(null, 201);
+    res.status(result.statusCode).json();
+});
+exports.addCommentToPost = addCommentToPost;
+const getPostComments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const postId = Number(req.params.id);
+    const post = yield post_1.default.findByPk(postId, {
+        include: [{
+                model: comment_1.default,
+                as: 'comments',
+                attributes: ['id', 'content', 'createdAt', 'updatedAt'],
+                include: [{ model: user_1.default, as: 'author', attributes: ['id', 'username'] }]
+            }]
+    });
+    if (post == null) {
+        const error = {
+            message: constants_1.default.POST_NOT_FOUND,
+            name: "Id",
+        };
+        const result = new Result_1.default(error, 404);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    const result = new Result_1.default(post.dataValues.comments, 200);
+    res.status(result.statusCode).json(result.value);
+});
+exports.getPostComments = getPostComments;

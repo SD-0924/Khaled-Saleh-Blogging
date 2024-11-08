@@ -13,31 +13,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sequelizeAuthentication = void 0;
-const core_1 = require("@sequelize/core");
-const mssql_1 = require("@sequelize/mssql");
 const dotenv_1 = __importDefault(require("dotenv"));
+const sequelize_1 = require("sequelize");
 dotenv_1.default.config();
-const sequelize = new core_1.Sequelize({
-    dialect: mssql_1.MsSqlDialect,
-    server: process.env.DBSERVER,
+const sequelize = new sequelize_1.Sequelize({
+    dialect: "mssql",
+    host: process.env.DBSERVER,
     port: Number(process.env.DBPORT),
     database: process.env.DBNAME,
-    authentication: {
-        type: "default",
+    username: process.env.DBUSERNAME,
+    password: process.env.DBPASSWORD,
+    dialectOptions: {
         options: {
-            userName: process.env.DBUSERNAME,
-            password: process.env.DBPASSWORD,
+            trustServerCertificate: true,
+            encrypt: true,
         }
     },
-    trustServerCertificate: true,
-    encrypt: true
+    logging: false
 });
 const sequelizeAuthentication = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("Connecting to the database...");
         yield sequelize.authenticate();
         console.log("Connection with database has been established successfully.");
-        yield sequelize.sync();
     }
     catch (exception) {
         console.error('Unable to connect to the database:', exception.message);

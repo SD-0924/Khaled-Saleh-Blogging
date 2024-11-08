@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import User, { UserInstance } from "../models/user";
-import { Op } from "@sequelize/core";
 import Result, { ResultWithPagination } from "../utilites/Result";
 import CONSTANTS from "../config/constants";
+import { Op } from "sequelize";
 
 interface UserRequestBody {
     username: string;
@@ -19,7 +19,7 @@ export const createUser = async(req : Request<{},{},UserRequestBody> ,res : Resp
     });
     if( user != null){
         const error : Error = {
-            message : CONSTANTS.USERNAMEOREMAILUSED,
+            message : CONSTANTS.USERNAME_OR_EMAIL_USED,
             name : "Conflict",
         }
         const result = new Result<Error>(error,409);
@@ -61,7 +61,7 @@ export const getUser = async (req : Request, res : Response, next : NextFunction
     const user = await User.findByPk(id);
     if (user == null){
         const error : Error = {
-            message : CONSTANTS.USERNOTFOUND,
+            message : CONSTANTS.USER_NOT_FOUND,
             name : "Id",
         }
         const result = new Result<Error>(error,404);
@@ -79,7 +79,7 @@ export const updateUser = async (req : Request<any,{},UserRequestBody>, res : Re
     const user = await User.findByPk(id);
     if (user == null){
         const error : Error = {
-            message : CONSTANTS.USERNOTFOUND,
+            message : CONSTANTS.USER_NOT_FOUND,
             name : "Id",
         }
         const result = new Result<Error>(error,404);
@@ -94,7 +94,7 @@ export const updateUser = async (req : Request<any,{},UserRequestBody>, res : Re
     });
     if( user_ != null){
         const error : Error = {
-            message : CONSTANTS.USERNAMEOREMAILUSED,
+            message : CONSTANTS.USERNAME_OR_EMAIL_USED,
             name : "Conflict",
         }
         const result = new Result<Error>(error,409);
@@ -115,12 +115,12 @@ export const updateUser = async (req : Request<any,{},UserRequestBody>, res : Re
 }
 
 
-export const deleteUser = async (req : Request<any,{},UserRequestBody>, res : Response, next : NextFunction) => {
+export const deleteUser = async (req : Request, res : Response, next : NextFunction) => {
     const id = Number(req.params.id);
     const user = await User.findByPk(id);
     if (user == null){
         const error : Error = {
-            message : CONSTANTS.USERNOTFOUND,
+            message : CONSTANTS.USER_NOT_FOUND,
             name : "Id",
         }
         const result = new Result<Error>(error,404);

@@ -2,7 +2,6 @@
 import dotenv from 'dotenv'
 import server from './server';
 import { sequelizeAuthentication } from './config/sequelize';
-import './models/associations';
 dotenv.config();
 
 (async() =>{
@@ -11,3 +10,5 @@ dotenv.config();
     console.log(`The server started and it's listening at port ${process.env.PORT}`);
   });
 })();
+
+import "./models/associations"

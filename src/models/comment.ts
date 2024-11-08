@@ -1,7 +1,8 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "@sequelize/core";
+
 import sequelize from "../config/sequelize";
 import User from "./user";
 import Post from "./post";
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 
 export interface CommentInstance extends Model<InferAttributes<CommentInstance>, InferCreationAttributes<CommentInstance>> {
     id: CreationOptional<number>;
@@ -37,9 +38,8 @@ const Comment = sequelize.define<CommentInstance>("Comment",
                 key: 'id',
             },
         },
-    }, {
-    tableName: 'comments',
-})
+    }
+)
 
 
 export default Comment;

@@ -13,21 +13,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const core_1 = require("@sequelize/core");
 const sequelize_1 = __importDefault(require("../config/sequelize"));
+const sequelize_2 = require("sequelize");
 const User = sequelize_1.default.define('User', {
     id: {
-        type: core_1.DataTypes.INTEGER,
+        type: sequelize_2.DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
     },
     username: {
-        type: core_1.DataTypes.STRING,
+        type: sequelize_2.DataTypes.STRING,
         allowNull: false,
         unique: true,
     },
     email: {
-        type: core_1.DataTypes.STRING,
+        type: sequelize_2.DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -35,11 +35,10 @@ const User = sequelize_1.default.define('User', {
         },
     },
     password: {
-        type: core_1.DataTypes.STRING,
+        type: sequelize_2.DataTypes.STRING,
         allowNull: false,
     },
 }, {
-    tableName: 'users',
     timestamps: true,
     hooks: {
         beforeCreate: (user) => __awaiter(void 0, void 0, void 0, function* () {

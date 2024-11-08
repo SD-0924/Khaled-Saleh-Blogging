@@ -14,19 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.updateUser = exports.getUser = exports.getUsers = exports.createUser = void 0;
 const user_1 = __importDefault(require("../models/user"));
-const core_1 = require("@sequelize/core");
 const Result_1 = __importDefault(require("../utilites/Result"));
 const constants_1 = __importDefault(require("../config/constants"));
+const sequelize_1 = require("sequelize");
 const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password } = req.body;
     const user = yield user_1.default.findOne({
         where: {
-            [core_1.Op.or]: [{ username }, { email }]
+            [sequelize_1.Op.or]: [{ username }, { email }]
         }
     });
     if (user != null) {
         const error = {
-            message: constants_1.default.USERNAMEOREMAILUSED,
+            message: constants_1.default.USERNAME_OR_EMAIL_USED,
             name: "Conflict",
         };
         const result = new Result_1.default(error, 409);
@@ -65,7 +65,7 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     const user = yield user_1.default.findByPk(id);
     if (user == null) {
         const error = {
-            message: constants_1.default.USERNOTFOUND,
+            message: constants_1.default.USER_NOT_FOUND,
             name: "Id",
         };
         const result = new Result_1.default(error, 404);
@@ -82,7 +82,7 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     const user = yield user_1.default.findByPk(id);
     if (user == null) {
         const error = {
-            message: constants_1.default.USERNOTFOUND,
+            message: constants_1.default.USER_NOT_FOUND,
             name: "Id",
         };
         const result = new Result_1.default(error, 404);
@@ -91,13 +91,13 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
     const user_ = yield user_1.default.findOne({
         where: {
-            [core_1.Op.or]: [{ username }, { email }],
-            id: { [core_1.Op.ne]: id }
+            [sequelize_1.Op.or]: [{ username }, { email }],
+            id: { [sequelize_1.Op.ne]: id }
         }
     });
     if (user_ != null) {
         const error = {
-            message: constants_1.default.USERNAMEOREMAILUSED,
+            message: constants_1.default.USERNAME_OR_EMAIL_USED,
             name: "Conflict",
         };
         const result = new Result_1.default(error, 409);
@@ -119,7 +119,7 @@ const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     const user = yield user_1.default.findByPk(id);
     if (user == null) {
         const error = {
-            message: constants_1.default.USERNOTFOUND,
+            message: constants_1.default.USER_NOT_FOUND,
             name: "Id",
         };
         const result = new Result_1.default(error, 404);
