@@ -30,7 +30,7 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             name: "Conflict",
         };
         const result = new Result_1.default(error, 409);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     const newUser = yield user_1.default.create({
@@ -39,10 +39,11 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         email
     });
     const result = new Result_1.default(newUser, 201);
-    res.status(result.statusCode).send(result.value);
+    res.status(result.statusCode).json(result.value);
 });
 exports.createUser = createUser;
 const getUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    throw new Error("err");
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
     const result = yield user_1.default.findAndCountAll({
@@ -69,11 +70,11 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
             name: "Id",
         };
         const result = new Result_1.default(error, 404);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     const result = new Result_1.default(user, 201);
-    res.status(result.statusCode).send(result.value);
+    res.status(result.statusCode).json(result.value);
 });
 exports.getUser = getUser;
 const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -86,7 +87,7 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             name: "Id",
         };
         const result = new Result_1.default(error, 404);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     const user_ = yield user_1.default.findOne({
@@ -101,7 +102,7 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             name: "Conflict",
         };
         const result = new Result_1.default(error, 409);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     yield user_1.default.update({
@@ -123,13 +124,13 @@ const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             name: "Id",
         };
         const result = new Result_1.default(error, 404);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     yield user_1.default.destroy({
         where: { id }
     });
     const result = new Result_1.default(user, 200);
-    res.status(result.statusCode).send(result.value);
+    res.status(result.statusCode).json(result.value);
 });
 exports.deleteUser = deleteUser;

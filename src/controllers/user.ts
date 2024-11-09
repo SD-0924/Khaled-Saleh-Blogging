@@ -23,7 +23,7 @@ export const createUser = async(req : Request<{},{},UserRequestBody> ,res : Resp
             name : "Conflict",
         }
         const result = new Result<Error>(error,409);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     const newUser = await User.create(
@@ -34,7 +34,7 @@ export const createUser = async(req : Request<{},{},UserRequestBody> ,res : Resp
         }
     );
     const result = new Result<UserInstance>(newUser,201);
-    res.status(result.statusCode).send(result.value);
+    res.status(result.statusCode).json(result.value);
 }
 
 
@@ -65,11 +65,11 @@ export const getUser = async (req : Request, res : Response, next : NextFunction
             name : "Id",
         }
         const result = new Result<Error>(error,404);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     const result = new Result<UserInstance>(user,201);
-    res.status(result.statusCode).send(result.value);
+    res.status(result.statusCode).json(result.value);
 }
 
 
@@ -83,7 +83,7 @@ export const updateUser = async (req : Request<any,{},UserRequestBody>, res : Re
             name : "Id",
         }
         const result = new Result<Error>(error,404);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     const user_ = await User.findOne({ 
@@ -98,7 +98,7 @@ export const updateUser = async (req : Request<any,{},UserRequestBody>, res : Re
             name : "Conflict",
         }
         const result = new Result<Error>(error,409);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     await User.update(
@@ -124,7 +124,7 @@ export const deleteUser = async (req : Request, res : Response, next : NextFunct
             name : "Id",
         }
         const result = new Result<Error>(error,404);
-        res.status(result.statusCode).send(result.value);
+        res.status(result.statusCode).json(result.value);
         return;
     }
     await User.destroy(
@@ -133,5 +133,5 @@ export const deleteUser = async (req : Request, res : Response, next : NextFunct
         }
     );
     const result = new Result<UserInstance>(user,200);
-    res.status(result.statusCode).send(result.value);
+    res.status(result.statusCode).json(result.value);
 }

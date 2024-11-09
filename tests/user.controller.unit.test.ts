@@ -10,7 +10,7 @@ const mockResponse = (): Partial<Response> => {
   const res = {} as Partial<Response>;
   res.status = jest.fn().mockReturnValue(res);
   res.json = jest.fn().mockReturnValue(res);
-  res.send = jest.fn().mockReturnValue(res);
+  res.json = jest.fn().mockReturnValue(res);
   return res;
 };
 // Mock the specific Sequelize model methods
@@ -37,7 +37,7 @@ describe('createUser', () => {
     });
     expect(User.create).toHaveBeenCalledWith(req.body);
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.send).toHaveBeenCalledWith({ id: 1, ...req.body });
+    expect(res.json).toHaveBeenCalledWith({ id: 1, ...req.body });
   });
 
   it('should return 409 if username or email is already used', async () => {
@@ -50,7 +50,7 @@ describe('createUser', () => {
     await createUser(req as Request, res as Response,  mockNext);
 
     expect(res.status).toHaveBeenCalledWith(409);
-    expect(res.send).toHaveBeenCalledWith({
+    expect(res.json).toHaveBeenCalledWith({
       message: CONSTANTS.USERNAME_OR_EMAIL_USED,
       name: 'Conflict'
     });
@@ -104,7 +104,7 @@ describe('getUser', () => {
 
     expect(User.findByPk).toHaveBeenCalledWith(1);
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.send).toHaveBeenCalledWith(mockUser);
+    expect(res.json).toHaveBeenCalledWith(mockUser);
   });
 
   it('should return 404 if user not found', async () => {
@@ -117,7 +117,7 @@ describe('getUser', () => {
     await getUser(req as Request, res as Response, mockNext);
 
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.send).toHaveBeenCalledWith({
+    expect(res.json).toHaveBeenCalledWith({
       message: CONSTANTS.USER_NOT_FOUND,
       name: 'Id'
     });
@@ -150,7 +150,7 @@ describe('deleteUser', () => {
     await deleteUser(req as Request, res as Response, mockNext);
 
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.send).toHaveBeenCalledWith({
+    expect(res.json).toHaveBeenCalledWith({
       message: CONSTANTS.USER_NOT_FOUND,
       name: 'Id'
     });
@@ -170,7 +170,7 @@ describe('updateUser', () => {
     await updateUser(req as Request, res as Response, mockNext);
 
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.send).toHaveBeenCalledWith({
+    expect(res.json).toHaveBeenCalledWith({
       message: CONSTANTS.USER_NOT_FOUND,
       name: 'Id'
     });
