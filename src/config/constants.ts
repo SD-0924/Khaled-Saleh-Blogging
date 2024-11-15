@@ -3,6 +3,8 @@ class CONSTANTS{
     static USER_NOT_FOUND: string = "User not found.";
     static POST_NOT_FOUND: string = "Post not found.";
     static SERVER_ERROR: string = "Server error.";
+    static NOT_AUTHENTICATED: string = "Not Authenticated.";
+    static FORBIDDEN: string = "InsufficientPermissions.";
 }
 
 export default CONSTANTS;

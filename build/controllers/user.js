@@ -12,11 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.updateUser = exports.getUser = exports.getUsers = exports.createUser = void 0;
+exports.loginUser = exports.deleteUser = exports.updateUser = exports.getUser = exports.getUsers = exports.createUser = void 0;
 const user_1 = __importDefault(require("../models/user"));
 const Result_1 = __importDefault(require("../utilites/Result"));
 const constants_1 = __importDefault(require("../config/constants"));
 const sequelize_1 = require("sequelize");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const server_1 = require("../server");
 const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password } = req.body;
     const user = yield user_1.default.findOne({
@@ -43,7 +45,6 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.createUser = createUser;
 const getUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    throw new Error("err");
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
     const result = yield user_1.default.findAndCountAll({
@@ -63,6 +64,16 @@ const getUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 exports.getUsers = getUsers;
 const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = Number(req.params.id);
+    const userId = req.user.id;
+    if (userId != id) {
+        const error = {
+            message: constants_1.default.FORBIDDEN,
+            name: "",
+        };
+        const result = new Result_1.default(error, 403);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
     const user = yield user_1.default.findByPk(id);
     if (user == null) {
         const error = {
@@ -73,6 +84,7 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
         res.status(result.statusCode).json(result.value);
         return;
     }
+    user.password = undefined;
     const result = new Result_1.default(user, 201);
     res.status(result.statusCode).json(result.value);
 });
@@ -134,3 +146,31 @@ const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     res.status(result.statusCode).json(result.value);
 });
 exports.deleteUser = deleteUser;
+const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const username = req.body.username || "";
+    const password = req.body.password || "";
+    const user = yield user_1.default.findOne({ where: { username } });
+    if (user == null) {
+        const error = {
+            message: constants_1.default.NOT_AUTHENTICATED,
+            name: "credentials",
+        };
+        const result = new Result_1.default(error, 401);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    const isVaildPassword = yield user.isValidPassword(password);
+    if (!isVaildPassword) {
+        const error = {
+            message: constants_1.default.NOT_AUTHENTICATED,
+            name: "credentials",
+        };
+        const result = new Result_1.default(error, 401);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    const token = jsonwebtoken_1.default.sign({ id: user.id }, server_1.JWT_SECRET, { expiresIn: '1h' });
+    const result = new Result_1.default(token, 200);
+    res.status(result.statusCode).json(result.value);
+});
+exports.loginUser = loginUser;

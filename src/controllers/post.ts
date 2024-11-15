@@ -15,6 +15,16 @@ interface CreatePostBody {
 export const createPost = async (req: Request<{}, {}, CreatePostBody>, res: Response): Promise<void> => {
     const { title, content, userId } = req.body;
     const user = await User.findByPk(userId);
+    const userId_ = (req as any).user.id;
+    if(userId_ != userId){
+        const error : Error = {
+            message : CONSTANTS.FORBIDDEN,
+            name : "",
+        }
+        const result = new Result<Error>(error,403);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
     if (user == null) {
         const error: Error = {
             message: CONSTANTS.USER_NOT_FOUND,
@@ -182,6 +192,16 @@ export const addCommentToPost = async (req: Request<any,any,AddCommentBody>, res
     const postId = Number(req.params.id);
     const { content, userId} = req.body;
     const post = await Post.findByPk(postId);
+    const userId_ = (req as any).user.id;
+    if(userId_ != userId){
+        const error : Error = {
+            message : CONSTANTS.FORBIDDEN,
+            name : "",
+        }
+        const result = new Result<Error>(error,403);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
     if (post == null){
         const error : Error = {
             message : CONSTANTS.POST_NOT_FOUND,

@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const user_1 = require("../controllers/user");
 const express_validator_1 = require("express-validator");
 const validation_1 = require("../utilites/validation");
+const server_1 = require("../server");
 const userRouter = express_1.default.Router();
 const userValidators = [
     (0, express_validator_1.body)("email")
@@ -21,6 +22,7 @@ const userValidators = [
         .isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
 ];
 userRouter.post("/", userValidators, validation_1.validateResult, user_1.createUser);
+userRouter.post("/auth", user_1.loginUser);
 const getUsersValidators = [
     (0, express_validator_1.query)("page")
         .optional()
@@ -37,7 +39,7 @@ userRouter.get("/", getUsersValidators, validation_1.validateResult, user_1.getU
 const getUserValidators = [
     (0, express_validator_1.param)("id").isInt({ min: 1 }).toInt()
 ];
-userRouter.get("/:id", getUserValidators, validation_1.validateResult, user_1.getUser);
+userRouter.get("/:id", server_1.authenticateToken, getUserValidators, validation_1.validateResult, user_1.getUser);
 const updateUserValidators = [
     (0, express_validator_1.param)("id").isInt({ min: 1 }).toInt(),
     ...userValidators

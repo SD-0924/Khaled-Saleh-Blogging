@@ -2,6 +2,7 @@ import express from "express";
 import { body, param, query } from "express-validator";
 import { validateResult } from "../utilites/validation";
 import { addCategoryToPost, addCommentToPost, createPost, deletePost, getPost, getPostCategories, getPostComments, getPosts, updatePost } from "../controllers/post";
+import { authenticateToken } from "../server";
 
 const postRouter = express.Router();
 
@@ -23,7 +24,7 @@ const createPostValidators = [
         .withMessage('User ID must be an integer'),
     validateResult,
 ]
-postRouter.post("/",createPostValidators,createPost);
+postRouter.post("/",authenticateToken,createPostValidators,createPost);
 
 
 const getPostsValidators = [
@@ -63,14 +64,14 @@ const updateUserValidators = [
     .withMessage('Content must be a string'),
     validateResult
 ]
-postRouter.put("/:id",updateUserValidators,updatePost);
+postRouter.put("/:id",authenticateToken,updateUserValidators,updatePost);
 
 
 const deletePostValidator = [
     param("id").isInt({min: 1}).toInt(),
     validateResult
 ]
-postRouter.delete("/:id",deletePostValidator,deletePost);
+postRouter.delete("/:id",authenticateToken,deletePostValidator,deletePost);
 
 
 const addCategoryToPostValidator= [
@@ -82,7 +83,7 @@ const addCategoryToPostValidator= [
         .withMessage('Category name must be a string'),
     validateResult
 ]
-postRouter.post("/:id/categories",addCategoryToPostValidator,addCategoryToPost);
+postRouter.post("/:id/categories",authenticateToken,addCategoryToPostValidator,addCategoryToPost);
 
 
 const getPostCategoriesValidators = [
@@ -105,7 +106,7 @@ export const addCommentToPostValidator = [
         .withMessage('User ID must be an integer'),
     validateResult,
 ];
-postRouter.post("/:id/comments",addCommentToPostValidator,addCommentToPost);
+postRouter.post("/:id/comments",authenticateToken,addCommentToPostValidator,addCommentToPost);
 
 
 const getPostCommentsValidators = [

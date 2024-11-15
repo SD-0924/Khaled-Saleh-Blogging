@@ -3,6 +3,8 @@ import User, { UserInstance } from "../models/user";
 import Result, { ResultWithPagination } from "../utilites/Result";
 import CONSTANTS from "../config/constants";
 import { Op } from "sequelize";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../server";
 
 interface UserRequestBody {
     username: string;
@@ -58,7 +60,17 @@ export const getUsers = async (req : Request, res : Response, next : NextFunctio
 
 export const getUser = async (req : Request, res : Response, next : NextFunction) => {
     const id = Number(req.params.id);
-    const user = await User.findByPk(id);
+    const userId = (req as any).user.id;
+    if(userId != id){
+        const error : Error = {
+            message : CONSTANTS.FORBIDDEN,
+            name : "",
+        }
+        const result = new Result<Error>(error,403);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    const user = await User.findByPk(id) as any;
     if (user == null){
         const error : Error = {
             message : CONSTANTS.USER_NOT_FOUND,
@@ -68,7 +80,8 @@ export const getUser = async (req : Request, res : Response, next : NextFunction
         res.status(result.statusCode).json(result.value);
         return;
     }
-    const result = new Result<UserInstance>(user,201);
+    user.password = undefined;
+    const result = new Result<any>(user,201);
     res.status(result.statusCode).json(result.value);
 }
 
@@ -77,6 +90,16 @@ export const updateUser = async (req : Request<any,{},UserRequestBody>, res : Re
     const id = Number(req.params.id);
     const { username , email , password } = req.body;
     const user = await User.findByPk(id);
+    const userId = (req as any).user.id;
+    if(userId != id){
+        const error : Error = {
+            message : CONSTANTS.FORBIDDEN,
+            name : "",
+        }
+        const result = new Result<Error>(error,403);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
     if (user == null){
         const error : Error = {
             message : CONSTANTS.USER_NOT_FOUND,
@@ -133,5 +156,34 @@ export const deleteUser = async (req : Request, res : Response, next : NextFunct
         }
     );
     const result = new Result<UserInstance>(user,200);
+    res.status(result.statusCode).json(result.value);
+}
+
+
+export const loginUser = async (req : Request, res : Response, next : NextFunction) => {
+    const username = req.body.username || "";
+    const password = req.body.password || "";
+    const user = await User.findOne({where: { username }});
+    if(user == null){
+        const error : Error = {
+            message : CONSTANTS.NOT_AUTHENTICATED,
+            name : "credentials",
+        }
+        const result = new Result<Error>(error,401);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    const isVaildPassword = await user.isValidPassword(password);
+    if(!isVaildPassword){
+        const error : Error = {
+            message : CONSTANTS.NOT_AUTHENTICATED,
+            name : "credentials",
+        }
+        const result = new Result<Error>(error,401);
+        res.status(result.statusCode).json(result.value);
+        return;
+    }
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
+    const result = new Result<string>(token,200);
     res.status(result.statusCode).json(result.value);
 }

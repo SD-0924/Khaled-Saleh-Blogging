@@ -4,6 +4,7 @@ import server from './server';
 import { sequelizeAuthentication } from './config/sequelize';
 dotenv.config();
 
+
 (async() =>{
   await sequelizeAuthentication();
   server.listen(process.env.PORT, async()=>{
@@ -12,3 +13,4 @@ dotenv.config();
 })();
 
 import "./models/associations"
+

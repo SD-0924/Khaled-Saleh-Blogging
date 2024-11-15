@@ -1,7 +1,8 @@
-import express from "express";
-import { createUser, deleteUser, getUser, getUsers, updateUser } from "../controllers/user";
+import express, { RequestHandler } from "express";
+import { createUser, deleteUser, getUser, getUsers, loginUser, updateUser } from "../controllers/user";
 import { body, param, query } from "express-validator";
 import { validateResult } from "../utilites/validation";
+import { authenticateToken } from "../server";
 
 const userRouter = express.Router();
 
@@ -21,6 +22,9 @@ const userValidators = [
 
 userRouter.post("/",userValidators,validateResult,createUser);
 
+
+userRouter.post("/auth",loginUser)
+
 const getUsersValidators = [
   query("page")
     .optional()
@@ -36,19 +40,21 @@ const getUsersValidators = [
 ]
 userRouter.get("/",getUsersValidators,validateResult,getUsers);
 
+
+
 const getUserValidators = [
   param("id").isInt({min: 1}).toInt()
 ]
-userRouter.get("/:id",getUserValidators,validateResult,getUser);
+userRouter.get("/:id",authenticateToken,getUserValidators,validateResult,getUser);
 
 const updateUserValidators = [
   param("id").isInt({min: 1}).toInt(),
   ...userValidators
 ]
-userRouter.put("/:id",updateUserValidators,validateResult,updateUser);
+userRouter.put("/:id",authenticateToken,updateUserValidators,validateResult,updateUser);
 
 const deleteUserValidator = [
   param("id").isInt({min: 1}).toInt()
 ]
-userRouter.delete("/:id",deleteUserValidator,validateResult,deleteUser);
+userRouter.delete("/:id",authenticateToken,deleteUserValidator,validateResult,deleteUser);
 export default userRouter;
